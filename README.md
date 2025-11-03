@@ -55,6 +55,12 @@ python database/init_database.py
 5. **Run the application**
 ```bash
 python run.py
+Enter the account and password for the corresponding role.
+All users initial password: 123123
+Teacher account: teacher@komodohub.edu
+Student accounts: student1@komodohub.edu, student2@komodohub.edu, student3@komodohub.edu, student4@komodohub.edu
+Admin account: admin@komodohub.edu
+Community organization account: org@komodohub.org
 ```
 
 The application will be available at `http://localhost:5000`
