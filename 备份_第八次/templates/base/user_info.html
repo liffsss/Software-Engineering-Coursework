@@ -1,0 +1,13 @@
+<!-- User Info Bar -->
+{% if session.username %}
+<div class="user-info">
+    <i class="fas fa-user"></i>
+    <span>{{ session.username }}</span>
+    <span class="user-role">
+        {% if session.role == 'teacher' %}Teacher
+        {% elif session.role == 'student' %}Student
+        {% elif session.role == 'community_org' %}Community Organization
+        {% endif %}
+    </span>
+</div>
+{% endif %}

@@ -1,0 +1,387 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Member Management - Komodo Hub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manage_members.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Member Management</h1>
+        <div class="header-actions">
+            <a href="{{ url_for('community.create_member') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Member
+            </a>
+            <a href="{{ url_for('community.dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Member Statistics -->
+    <div class="members-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ (active_members or 0) + (inactive_members or 0) }}</h3>
+                <p>Total Members</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #28a745;">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ active_members or 0 }}</h3>
+                <p>Active Members</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #6c757d;">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ inactive_members or 0 }}</h3>
+                <p>Inactive Members</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #dc3545;">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ admin_members or 0 }}</h3>
+                <p>Admins</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="members-management-layout">
+        <!-- Left Sidebar - Groups Navigation -->
+        <div class="groups-sidebar">
+            <div class="sidebar-header">
+                <h3>Member Groups</h3>
+                <button type="button" class="btn btn-outline btn-sm" id="createGroupBtn">
+                    <i class="fas fa-plus"></i> New Group
+                </button>
+            </div>
+
+            <div class="groups-list">
+                <!-- All Members -->
+                <div class="group-item active" data-group-id="all">
+                    <div class="group-color-dot color-all"></div>
+                    <div class="group-info">
+                        <span class="group-name">All Members</span>
+                        <small class="group-desc">View all members</small>
+                    </div>
+                    <span class="member-count">{{ (active_members or 0) + (inactive_members or 0) }}</span>
+                </div>
+
+                {% if groups %}
+                    {% for group in groups %}
+                    <div class="group-item" data-group-id="{{ group.id }}">
+                        <div class="group-color-dot color-{{ loop.index0 % 6 }}"></div>
+                        <div class="group-info">
+                            <span class="group-name">{{ group.name }}</span>
+                            {% if group.description %}
+                            <small class="group-desc">{{ group.description }}</small>
+                            {% endif %}
+                        </div>
+                        <span class="member-count">
+                            {% if grouped_members and group.id in grouped_members %}
+                                {{ grouped_members[group.id].members|length }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Ungrouped -->
+                <div class="group-item" data-group-id="ungrouped">
+                    <div class="group-color-dot color-ungrouped"></div>
+                    <div class="group-info">
+                        <span class="group-name">Ungrouped</span>
+                        <small class="group-desc">Members not assigned to any group</small>
+                    </div>
+                    <span class="member-count">{{ ungrouped_members|length if ungrouped_members else 0 }}</span>
+                </div>
+            </div>
+
+            <!-- Create Group Form -->
+            <div class="create-group-form" id="createGroupForm" style="display: none;">
+                <form method="POST" action="{{ url_for('community.create_member_group') }}">
+                    <div class="form-group">
+                        <label for="group_name">Group Name</label>
+                        <input type="text" id="group_name" name="name" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="group_description">Group Description</label>
+                        <textarea id="group_description" name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-sm">Create</button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="cancelGroupBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="members-content">
+            <!-- Current Group Information -->
+            <div class="current-group-header">
+                <h2 id="currentGroupName">All Members</h2>
+                <div class="group-actions">
+                    <button class="btn btn-outline btn-sm" id="toggleGroupView">
+                        <i class="fas fa-expand"></i> Expand/Collapse All
+                    </button>
+                </div>
+            </div>
+
+            <!-- All Members View -->
+            <div class="group-section active" data-group-id="all">
+                <div class="members-container">
+                    {% if grouped_members or ungrouped_members %}
+                        {% for group_id, group_data in grouped_members.items() %}
+                            {% if group_data.members %}
+                            <div class="group-subsection" data-group-id="{{ group_id }}">
+                                <div class="subsection-header">
+                                    <div class="subsection-info">
+                                        <div class="group-color-indicator color-{{ loop.index0 % 6 }}"></div>
+                                        <h4>{{ group_data.group_info.name }}</h4>
+                                        <span class="member-count">{{ group_data.members|length }} members</span>
+                                    </div>
+                                    <button class="btn btn-link btn-sm toggle-subsection">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                                <div class="subsection-content">
+                                    <div class="members-grid">
+                                        {% for member in group_data.members %}
+                                        <!-- Member Card -->
+                                        {% include 'components/member_card.html' %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if ungrouped_members %}
+                        <div class="group-subsection" data-group-id="ungrouped">
+                            <div class="subsection-header">
+                                <div class="subsection-info">
+                                    <div class="group-color-indicator color-ungrouped"></div>
+                                    <h4>Ungrouped</h4>
+                                    <span class="member-count">{{ ungrouped_members|length }} members</span>
+                                </div>
+                                <button class="btn btn-link btn-sm toggle-subsection">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="subsection-content">
+                                <div class="members-grid">
+                                    {% for member in ungrouped_members %}
+                                    <!-- Member Card -->
+                                    {% include 'components/member_card.html' %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <div class="no-members">
+                        <div class="empty-state">
+                            <i class="fas fa-users fa-3x"></i>
+                            <h3>No Members</h3>
+                            <p>You haven't added any members yet</p>
+                            <a href="{{ url_for('community.create_member') }}" class="btn btn-primary">
+                                Add First Member
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Individual Group Views -->
+            {% if groups %}
+                {% for group in groups %}
+                <div class="group-section" data-group-id="{{ group.id }}">
+                    <div class="group-header">
+                        <div class="group-info">
+                            <div class="group-color-indicator color-{{ loop.index0 % 6 }}"></div>
+                            <div>
+                                <h3>{{ group.name }}</h3>
+                                {% if group.description %}
+                                <p class="group-description">{{ group.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- 完全移除 group-header-actions 部分 -->
+                    </div>
+
+                    <div class="members-container">
+                        {% if grouped_members and group.id in grouped_members and grouped_members[group.id].members %}
+                            <div class="members-grid">
+                                {% for member in grouped_members[group.id].members %}
+                                <!-- Member Card -->
+                                {% include 'components/member_card.html' %}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                        <div class="no-members-in-group">
+                            <div class="empty-state">
+                                <i class="fas fa-users fa-2x"></i>
+                                <h4>No Members in this Group</h4>
+                                <p>Assign members to this group to start managing</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Ungrouped View -->
+            <div class="group-section" data-group-id="ungrouped">
+                <div class="group-header">
+                    <div class="group-info">
+                        <div class="group-color-indicator color-ungrouped"></div>
+                        <div>
+                            <h3>Ungrouped Members</h3>
+                            <p class="group-description">Members not assigned to any group</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="members-container">
+                    {% if ungrouped_members %}
+                        <div class="members-grid">
+                            {% for member in ungrouped_members %}
+                            <!-- Member Card -->
+                            {% include 'components/member_card.html' %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <div class="no-members-in-group">
+                        <div class="empty-state">
+                            <i class="fas fa-users fa-2x"></i>
+                            <h4>No Ungrouped Members</h4>
+                            <p>All members have been assigned to groups</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Group creation form control
+    const createGroupBtn = document.getElementById('createGroupBtn');
+    const cancelGroupBtn = document.getElementById('cancelGroupBtn');
+    const createGroupForm = document.getElementById('createGroupForm');
+    const groupsList = document.querySelector('.groups-list');
+
+    if (createGroupBtn) {
+        createGroupBtn.addEventListener('click', function() {
+            groupsList.style.display = 'none';
+            createGroupForm.style.display = 'block';
+            createGroupBtn.style.display = 'none';
+        });
+    }
+
+    if (cancelGroupBtn) {
+        cancelGroupBtn.addEventListener('click', function() {
+            groupsList.style.display = 'block';
+            createGroupForm.style.display = 'none';
+            createGroupBtn.style.display = 'block';
+        });
+    }
+
+    // Group navigation switching
+    const groupItems = document.querySelectorAll('.group-item[data-group-id]');
+    const groupSections = document.querySelectorAll('.group-section[data-group-id]');
+    const currentGroupName = document.getElementById('currentGroupName');
+
+    groupItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const groupId = this.getAttribute('data-group-id');
+
+            // Update active state
+            groupItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+
+            // Show corresponding group content
+            groupSections.forEach(section => {
+                section.classList.remove('active');
+                if (section.getAttribute('data-group-id') === groupId) {
+                    section.classList.add('active');
+                }
+            });
+
+            // Update current group name
+            const groupName = this.querySelector('.group-name').textContent;
+            currentGroupName.textContent = groupName;
+        });
+    });
+
+    // Subsection expand/collapse
+    const toggleButtons = document.querySelectorAll('.toggle-subsection');
+    const toggleGroupViewBtn = document.getElementById('toggleGroupView');
+
+    let allExpanded = true;
+
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const subsection = this.closest('.group-subsection');
+            const content = subsection.querySelector('.subsection-content');
+            const icon = this.querySelector('i');
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                content.style.display = 'none';
+                icon.className = 'fas fa-chevron-right';
+            }
+        });
+    });
+
+    if (toggleGroupViewBtn) {
+        toggleGroupViewBtn.addEventListener('click', function() {
+            const contents = document.querySelectorAll('.subsection-content');
+            const icons = document.querySelectorAll('.toggle-subsection i');
+
+            if (allExpanded) {
+                // Collapse all
+                contents.forEach(content => content.style.display = 'none');
+                icons.forEach(icon => icon.className = 'fas fa-chevron-right');
+                allExpanded = false;
+                this.innerHTML = '<i class="fas fa-expand"></i> Expand All';
+            } else {
+                // Expand all
+                contents.forEach(content => content.style.display = 'block');
+                icons.forEach(icon => icon.className = 'fas fa-chevron-down');
+                allExpanded = true;
+                this.innerHTML = '<i class="fas fa-compress"></i> Collapse All';
+            }
+        });
+    }
+
+    // Initialize to show first group
+    if (groupItems.length > 0) {
+        groupItems[0].click();
+    }
+});
+</script>
+{% endblock %}

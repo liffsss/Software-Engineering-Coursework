@@ -1,0 +1,76 @@
+<!-- templates/pages/teacher/courses.html -->
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teacher.css') }}">
+{% endblock %}
+
+{% block title %}Course Management - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Course Management</h1>
+        <p>Manage your course content</p>
+    </div>
+
+    <!-- Add Course Form -->
+    <div class="content-section">
+        <h2 class="section-title">Create New Course</h2>
+        <form method="POST" class="course-form">
+            <div class="form-group">
+                <label for="title">Course Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Course Description:</label>
+                <textarea id="description" name="description" rows="4" placeholder="Enter course description..."></textarea>
+            </div>
+            <button type="submit" name="add_course" class="btn btn-primary">Create Course</button>
+        </form>
+    </div>
+
+    <!-- Course List -->
+    <div class="content-section">
+        <h2 class="section-title">My Courses</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="courses-list">
+            {% for course in courses %}
+            <div class="course-card">
+                <div class="course-info">
+                    <h3>{{ course['title'] }}</h3>
+                    <p>{{ course['description'] or 'No description' }}</p>
+                    <div class="course-stats">
+                        <span>Total Students: {{ course['total_students'] or 0 }}</span>
+                        <span>Completed: {{ course['completed_students'] or 0 }}</span>
+                        <span>Average Score: {{ "%.2f"|format(course['average_score'] or 0) }}</span>
+                    </div>
+                    <p class="course-meta">Created: {{ course['created_at'][:10] }}</p>
+                </div>
+                <div class="course-actions">
+                    <a href="{{ url_for('teacher.course_students', course_id=course['id']) }}" class="btn btn-secondary">View Students</a>
+                    <form method="POST" onsubmit="return confirm('Are you sure you want to delete this course? This action cannot be undone.');">
+                        <input type="hidden" name="course_id" value="{{ course['id'] }}">
+                        <button type="submit" name="delete_course" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-courses">
+                <p>No courses available</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+<!-- templates/pages/teacher/profile.html - Complete Update -->
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teacher.css') }}">
+{% endblock %}
+
+{% block title %}Profile - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Profile</h1>
+        <p>Manage your account information and personal settings</p>
+    </div>
+
+    <div class="profile-content">
+        <!-- Basic Information Card -->
+        <div class="content-section">
+            <h2 class="section-title">Basic Information</h2>
+            <div class="profile-card">
+                <div class="profile-avatar-large">
+                    {% if teacher_info['avatar'] %}
+                        <img src="{{ teacher_info['avatar'] }}" alt="Avatar">
+                    {% else %}
+                        <i class="fas fa-user-circle"></i>
+                    {% endif %}
+                </div>
+                <div class="profile-details">
+                    <div class="profile-item">
+                        <span class="label">Full Name:</span>
+                        <span class="value">{{ teacher_info['full_name'] }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="label">Email:</span>
+                        <span class="value">{{ teacher_info['username'] }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="label">Teacher ID:</span>
+                        <span class="value">{{ teacher_info['teacher_id'] or 'Not set' }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="label">Department:</span>
+                        <span class="value">{{ teacher_info['department'] or 'Not set' }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="label">Registration Date:</span>
+                        <span class="value">{{ teacher_info['created_at'][:10] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Selection -->
+        <div class="content-section">
+            <h2 class="section-title">Choose Avatar</h2>
+            <form method="POST" class="avatar-form">
+                <div class="avatar-selection">
+                    {% for avatar in avatars %}
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="{{ avatar }}"
+                               {% if teacher_info['avatar'] == avatar %}checked{% endif %}>
+                        <div class="avatar-preview">
+                            <img src="{{ avatar }}" alt="Avatar {{ loop.index }}">
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                <button type="submit" name="update_avatar" class="btn btn-primary">Update Avatar</button>
+            </form>
+        </div>
+
+        <!-- Profile Update Form -->
+        <div class="content-section">
+            <h2 class="section-title">Update Personal Information</h2>
+            <form method="POST" class="profile-form">
+                <div class="form-group">
+                    <label for="full_name">Full Name:</label>
+                    <input type="text" id="full_name" name="full_name" value="{{ teacher_info['full_name'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <input type="text" id="department" name="department" value="{{ teacher_info['department'] or '' }}" placeholder="Enter your department">
+                </div>
+                <button type="submit" name="update_profile" class="btn btn-primary">Update Profile</button>
+            </form>
+        </div>
+
+        <!-- Change Password Form -->
+        <div class="content-section">
+            <h2 class="section-title">Change Password</h2>
+            <form method="POST" class="password-form">
+                <div class="form-group">
+                    <label for="current_password">Current Password:</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" id="new_password" name="new_password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+                </div>
+                <button type="submit" name="change_password" class="btn btn-primary">Change Password</button>
+            </form>
+        </div>
+
+        <!-- Message Display -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+<!-- templates/pages/teacher/analytics.html -->
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teacher.css') }}">
+{% endblock %}
+
+{% block title %}Analytics - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Analytics</h1>
+        <p>View course completion rates and student performance</p>
+    </div>
+
+    <!-- Overall Statistics -->
+    <div class="content-section">
+        <h2 class="section-title">Overview</h2>
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ overall_stats['total_courses'] or 0 }}</h3>
+                    <p>Total Courses</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ overall_stats['total_students'] or 0 }}</h3>
+                    <p>Total Students</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ overall_stats['total_completions'] or 0 }}</h3>
+                    <p>Total Completions</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ "%.1f"|format(overall_stats['overall_average_score'] or 0) }}</h3>
+                    <p>Average Score</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Detailed Statistics -->
+    <div class="content-section">
+        <h2 class="section-title">Course Statistics</h2>
+
+        {% if course_stats %}
+        <div class="course-analytics-list">
+            {% for course in course_stats %}
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <h3>{{ course['title'] }}</h3>
+                    <span class="course-id">Course ID: {{ course['id'] }}</span>
+                </div>
+
+                <div class="analytics-content">
+                    <div class="stat-row">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Students:</span>
+                            <span class="stat-value">{{ course['total_students'] or 0 }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Completed:</span>
+                            <span class="stat-value">{{ course['completed_students'] or 0 }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Average Score:</span>
+                            <span class="stat-value">{{ "%.2f"|format(course['average_score'] or 0) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="score-distribution">
+                        <h4>Score Distribution</h4>
+                        <div class="distribution-bars">
+                            <div class="distribution-item">
+                                <span class="dist-label">Excellent (90-100):</span>
+                                <div class="dist-bar-container">
+                                    <div class="dist-bar excellent" style="width: {{ (course['excellent_students'] / course['total_students'] * 100) if course['total_students'] > 0 else 0 }}%"></div>
+                                    <span class="dist-count">{{ course['excellent_students'] or 0 }}</span>
+                                </div>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="dist-label">Good (60-89):</span>
+                                <div class="dist-bar-container">
+                                    <div class="dist-bar good" style="width: {{ (course['good_students'] / course['total_students'] * 100) if course['total_students'] > 0 else 0 }}%"></div>
+                                    <span class="dist-count">{{ course['good_students'] or 0 }}</span>
+                                </div>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="dist-label">Failing (<60):</span>
+                                <div class="dist-bar-container">
+                                    <div class="dist-bar failing" style="width: {{ (course['failing_students'] / course['total_students'] * 100) if course['total_students'] > 0 else 0 }}%"></div>
+                                    <span class="dist-count">{{ course['failing_students'] or 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="completion-rate">
+                        <span class="rate-label">Completion Rate:</span>
+                        <div class="rate-bar">
+                            <div class="rate-progress" style="width: {{ (course['completed_students'] / course['total_students'] * 100) if course['total_students'] > 0 else 0 }}%"></div>
+                            <span class="rate-text">{{ "%.1f"|format((course['completed_students'] / course['total_students'] * 100) if course['total_students'] > 0 else 0) }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-data">
+            <p>No course statistics available</p>
+            <p>Please create courses and have students participate in learning</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

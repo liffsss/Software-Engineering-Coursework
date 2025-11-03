@@ -1,0 +1,50 @@
+<!-- templates/pages/teacher/course_students.html -->
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teacher.css') }}">
+{% endblock %}
+
+{% block title %}{{ course['title'] }} - Student Details - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>{{ course['title'] }} - Student Details</h1>
+        <p>View students in the course and their grades</p>
+    </div>
+
+    <div class="content-section">
+        <h2 class="section-title">Student List</h2>
+
+        <div class="students-list">
+            {% for student in students %}
+            <div class="student-card">
+                <div class="student-info">
+                    <h3>{{ student['full_name'] }}</h3>
+                    <p>Student ID: {{ student['student_id'] or 'Not set' }}</p>
+                    <p>Email: {{ student['email'] }}</p>
+                    <div class="student-stats">
+                        <span class="score">Score: {{ student['score'] or 'Not graded' }}</span>
+                        <span class="status">Status:
+                            {% if student['status'] == 'completed' %}
+                                <span class="status-completed">Completed</span>
+                            {% elif student['status'] == 'enrolled' %}
+                                <span class="status-enrolled">In Progress</span>
+                            {% else %}
+                                <span class="status-other">{{ student['status'] }}</span>
+                            {% endif %}
+                        </span>
+                        <span class="enrollment-date">Enrollment Date: {{ student['enrollment_date'][:10] }}</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-students">
+                <p>No students enrolled in this course</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

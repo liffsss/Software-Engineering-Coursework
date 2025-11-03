@@ -1,0 +1,66 @@
+<!-- templates/pages/teacher/students_management.html -->
+{% extends 'base/base.html' %}
+
+{% block title %}学生管理 - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>学生管理</h1>
+        <p>管理您的学生账户</p>
+    </div>
+
+    <!-- 添加学生表单 -->
+    <div class="content-section">
+        <h2 class="section-title">添加新学生</h2>
+        <form method="POST" class="student-form">
+            <div class="form-group">
+                <label for="full_name">学生姓名:</label>
+                <input type="text" id="full_name" name="full_name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱地址:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit" name="add_student" class="btn btn-primary">添加学生</button>
+        </form>
+    </div>
+
+    <!-- 学生列表 -->
+    <div class="content-section">
+        <h2 class="section-title">学生列表</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="students-list">
+            {% for student in students %}
+            <div class="student-card">
+                <div class="student-info">
+                    <h3>{{ student['full_name'] }}</h3>
+                    <p>邮箱: {{ student['email'] }}</p>
+                    <p>添加时间: {{ student['created_at'][:10] }}</p>
+                </div>
+                <div class="student-actions">
+                    <form method="POST" onsubmit="return confirm('确定要删除这名学生吗？此操作不可撤销。');">
+                        <input type="hidden" name="student_id" value="{{ student['id'] }}">
+                        <button type="submit" name="delete_student" class="btn btn-danger">删除</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-students">
+                <p>暂无学生数据</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

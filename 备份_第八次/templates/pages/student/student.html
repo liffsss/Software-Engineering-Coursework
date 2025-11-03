@@ -1,0 +1,101 @@
+<!-- templates/pages/student/student.html -->
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+{% endblock %}
+
+{% block title %}Student Dashboard - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Updated dashboard header with profile link -->
+    <div class="dashboard-header">
+        <h1>Student Dashboard</h1>
+        <p>Welcome back, <a href="{{ url_for('student.profile') }}" class="profile-link">{{ session.full_name or session.username }}</a>!</p>
+    </div>
+
+    <!-- Rest of the content remains the same -->
+    <!-- Student Information Card -->
+    <div class="content-section">
+        <div class="student-profile-card">
+            <h2 class="section-title">Personal Information</h2>
+            <div class="profile-info">
+                <div class="profile-item">
+                    <span class="label">Full Name:</span>
+                    <span class="value">{{ student_info['full_name'] }}</span>
+                </div>
+                <div class="profile-item">
+                    <span class="label">Student ID:</span>
+                    <span class="value">{{ student_info['student_id'] or 'Not set' }}</span>
+                </div>
+                <div class="profile-item">
+                    <span class="label">Grade:</span>
+                    <span class="value">{{ student_info['grade'] or 'Not set' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrolled Courses -->
+    <div class="content-section">
+        <h2 class="section-title">My Courses</h2>
+
+        {% if enrolled_courses %}
+        <div class="courses-grid">
+            {% for course in enrolled_courses %}
+            <div class="course-card student-course-card">
+                <h3>{{ course['title'] }}</h3>
+                <p class="course-description">{{ course['description'] }}</p>
+                <div class="course-meta">
+                    <span class="teacher">Teacher: {{ course['teacher_name'] }}</span>
+                    <span class="status">Status:
+                        {% if course['status'] == 'completed' %}
+                            <span class="status-completed">Completed</span>
+                        {% else %}
+                            <span class="status-enrolled">In Progress</span>
+                        {% endif %}
+                    </span>
+                    {% if course['score'] %}
+                    <span class="score">Score: {{ course['score'] }}</span>
+                    {% endif %}
+                </div>
+                <div class="course-actions">
+                    <a href="{{ url_for('student.study_course', course_id=course['id']) }}" class="btn btn-primary">
+                        {% if course['status'] == 'completed' %}Review Course{% else %}Start Learning{% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-courses">
+            <p>You haven't enrolled in any courses yet</p>
+            <a href="{{ url_for('student.courses') }}" class="btn btn-primary">Browse Courses</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Available Courses -->
+    {% if available_courses %}
+    <div class="content-section">
+        <h2 class="section-title">Available Courses</h2>
+        <div class="courses-grid">
+            {% for course in available_courses %}
+            <div class="course-card available-course-card">
+                <h3>{{ course['title'] }}</h3>
+                <p class="course-description">{{ course['description'] }}</p>
+                <div class="course-meta">
+                    <span class="teacher">Teacher: {{ course['teacher_name'] }}</span>
+                    <span class="enrolled-count">{{ course['enrolled_students'] }} students enrolled</span>
+                </div>
+                <div class="course-actions">
+                    <a href="{{ url_for('student.enroll_course', course_id=course['id']) }}" class="btn btn-success">Enroll in Course</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

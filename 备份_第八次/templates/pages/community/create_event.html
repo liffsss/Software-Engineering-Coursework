@@ -1,0 +1,71 @@
+
+{% extends 'base/base.html' %}
+
+{% block title %}Create Event - Komodo Hub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create_event.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Create New Event</h1>
+        <a href="{{ url_for('community.manage_events') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Event Management
+        </a>
+    </div>
+
+    <div class="event-form-container">
+        <form method="POST" class="event-form">
+            <div class="form-group">
+                <label for="title">Event Title *</label>
+                <input type="text" id="title" name="title" required
+                       placeholder="Enter event title" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Event Description *</label>
+                <textarea id="description" name="description" required
+                          placeholder="Enter event description..."
+                          rows="6" class="form-control"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="event_date">Event Date *</label>
+                    <input type="date" id="event_date" name="event_date" required
+                           class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="event_time">Event Time</label>
+                    <input type="time" id="event_time" name="event_time"
+                           class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Event Location</label>
+                <input type="text" id="location" name="location"
+                       placeholder="Enter event location" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="max_participants">Maximum Participants</label>
+                <input type="number" id="max_participants" name="max_participants"
+                       min="1" placeholder="Leave empty for unlimited" class="form-control">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus"></i> Create Event
+                </button>
+                <a href="{{ url_for('community.manage_events') }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

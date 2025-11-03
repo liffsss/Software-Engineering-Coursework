@@ -1,0 +1,45 @@
+
+{% extends 'base/base.html' %}
+
+{% block title %}Publish Article - Komodo Hub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create_article.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Publish New Article</h1>
+        <a href="{{ url_for('community.manage_articles') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Article Management
+        </a>
+    </div>
+
+    <div class="article-form-container">
+        <form method="POST" class="article-form">
+            <div class="form-group">
+                <label for="title">Article Title</label>
+                <input type="text" id="title" name="title" required
+                       placeholder="Enter article title" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="content">Article Content</label>
+                <textarea id="content" name="content" required
+                          placeholder="Enter article content..."
+                          rows="15" class="form-control"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Publish Article
+                </button>
+                <a href="{{ url_for('community.manage_articles') }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

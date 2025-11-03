@@ -1,0 +1,61 @@
+<!-- templates/pages/teacher/teacher.html -->
+{% extends 'base/base.html' %}
+
+{% block title %}Teacher Dashboard - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Updated dashboard header with profile link -->
+    <div class="dashboard-header">
+        <h1>Teacher Dashboard</h1>
+        <p>Welcome back, <a href="{{ url_for('teacher.profile') }}" class="profile-link">{{ session.full_name or session.username }}</a>!</p>
+    </div>
+
+    <!-- Rest of the content remains the same -->
+    <div class="dashboard-content">
+        <h2 class="section-title">Features Panel</h2>
+        <div class="dashboard-grid">
+            {% from "components/dashboard_card.html" import dashboard_card %}
+            {{ dashboard_card(
+                icon="fas fa-chalkboard-teacher",
+                title="My Courses",
+                description="You currently have " + teacher_data.course_count|string + " active courses",
+                button_text="Manage Courses",
+                link=url_for('teacher.courses')
+            ) }}
+
+            {{ dashboard_card(
+                icon="fas fa-user-graduate",
+                title="Student Management",
+                description="You have " + teacher_data.student_count|string + " students in total",
+                button_text="Manage Students",
+                link=url_for('teacher.students_management')
+            ) }}
+
+            {{ dashboard_card(
+                icon="fas fa-chart-line",
+                title="Analytics",
+                description="View course completion rates and student performance",
+                button_text="View Analytics",
+                link=url_for('teacher.analytics')
+            ) }}
+        </div>
+    </div>
+
+    <!-- Articles List -->
+    <div class="articles-section">
+        <h2 class="section-title">Latest Articles</h2>
+
+        <div class="articles-grid">
+            {% for article in articles %}
+                {% from "components/article_card.html" import article_card %}
+                {{ article_card(article) }}
+            {% else %}
+            <div class="no-articles">
+                <p>No articles to display.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

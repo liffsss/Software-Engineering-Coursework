@@ -1,0 +1,36 @@
+<!--templates/components/article_card.html-->
+{% macro article_card(article, show_admin_actions=false) %}
+<div class="article-card">
+    <div class="article-header">
+        <h3 class="article-title">{{ article['title'] }}</h3>
+    </div>
+    <div class="article-body">
+        <p class="article-content">
+            {% if article['content'] %}
+                {{ article['content'][:100] }}{% if article['content']|length > 100 %}...{% endif %}
+            {% else %}
+                No content summary available
+            {% endif %}
+        </p>
+        {% if show_admin_actions %}
+        <div class="article-actions">
+            <button class="btn btn-primary btn-sm view-article" data-article-id="{{ article['id'] }}">
+                <i class="fas fa-eye"></i> View
+            </button>
+            <button class="btn btn-secondary btn-sm edit-article" data-article-id="{{ article['id'] }}">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-danger btn-sm delete-article" data-article-id="{{ article['id'] }}">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+        {% else %}
+        <a href="#" class="read-more">Read More →</a>
+        {% endif %}
+    </div>
+    <div class="article-meta">
+        <span class="article-author">{{ article['author'] or 'Unknown Author' }}</span>
+        <span class="article-date">{{ article['created_at'] }}</span>
+    </div>
+</div>
+{% endmacro %}

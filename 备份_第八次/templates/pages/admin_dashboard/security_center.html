@@ -1,0 +1,508 @@
+<!--templates/pages/admin_dashboard/security_center.html-->
+{% extends 'base/base.html' %}
+
+{% block title %}Security Center - Komodo Hub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.security-container {
+    margin-top: 20px;
+}
+
+.security-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.security-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.security-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.security-card.critical {
+    border-left: 4px solid #dc3545;
+}
+
+.security-card.warning {
+    border-left: 4px solid #ffc107;
+}
+
+.security-card.success {
+    border-left: 4px solid #28a745;
+}
+
+.security-card h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.security-card.critical h3 {
+    color: #dc3545;
+}
+
+.security-card.warning h3 {
+    color: #ffc107;
+}
+
+.security-card.success h3 {
+    color: #28a745;
+}
+
+.security-card p {
+    margin: 5px 0 0;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.security-card .security-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logs-table th,
+.logs-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.logs-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.log-level {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.log-level.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.log-level.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.log-level.info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.database-browser {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.table-selector {
+    margin-bottom: 20px;
+}
+
+.table-selector select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+.table-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.sql-editor {
+    margin-top: 30px;
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.sql-editor textarea {
+    width: 100%;
+    height: 120px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    resize: vertical;
+    background: #f8f9fa;
+}
+
+.sql-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.sql-result {
+    margin-top: 20px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.system-status {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.status-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.status-card h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.status-label {
+    color: #6c757d;
+}
+
+.status-value {
+    font-weight: 500;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.risk-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.risk-high {
+    background: #dc3545;
+}
+
+.risk-medium {
+    background: #ffc107;
+}
+
+.risk-low {
+    background: #28a745;
+}
+
+.audit-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Security Center</h1>
+        <p>Manage system security, logs, and database</p>
+    </div>
+
+    <div class="security-container">
+        <!-- Security Overview -->
+        <div class="security-overview" id="securityOverview">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading security status...</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="logs">Security Logs</button>
+            <button class="tab" data-tab="database">Database Management</button>
+            <button class="tab" data-tab="system">System Status</button>
+            <button class="tab" data-tab="audit">Security Audit</button>
+        </div>
+
+        <!-- Security Logs -->
+        <div class="tab-content active" id="logs">
+            <div class="audit-actions">
+                <button id="refreshLogs" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Refresh Logs
+                </button>
+                <button id="clearLogs" class="btn btn-secondary">
+                    <i class="fas fa-trash"></i> Clear Logs
+                </button>
+                <button id="exportLogs" class="btn btn-success">
+                    <i class="fas fa-download"></i> Export Logs
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Level</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Description</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        <!-- Log data loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Database Management -->
+        <div class="tab-content" id="database">
+            <div class="database-browser">
+                <div class="table-selector">
+                    <label>Select Table: </label>
+                    <select id="tableSelect">
+                        <option value="">Select table...</option>
+                    </select>
+                </div>
+
+                <div id="tableInfo" class="table-info" style="display: none;">
+                    <!-- Table info loaded via JS -->
+                </div>
+
+                <div class="table-container">
+                    <table class="logs-table" id="databaseTable">
+                        <!-- Table data loaded via JS -->
+                    </table>
+                </div>
+            </div>
+
+            <div class="sql-editor">
+                <h4>SQL Query Editor</h4>
+                <textarea id="sqlQuery" placeholder="Enter SQL query (only SELECT and PRAGMA queries allowed)"></textarea>
+                <div class="sql-actions">
+                    <button id="executeSql" class="btn btn-primary">Execute Query</button>
+                    <button id="clearSql" class="btn btn-secondary">Clear</button>
+                    <button id="explainSql" class="btn btn-info">Explain Query</button>
+                </div>
+                <div id="sqlResult" class="sql-result">
+                    <!-- Query results -->
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="tab-content" id="system">
+            <div class="system-status">
+                <div class="status-card">
+                    <h4>Server Status</h4>
+                    <div class="status-item">
+                        <span class="status-label">Uptime</span>
+                        <span class="status-value" id="uptime">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Server Load</span>
+                        <span class="status-value" id="serverLoad">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Memory Usage</span>
+                        <span class="status-value" id="memoryUsage">-</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="memoryBar" style="width: 0%"></div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">CPU Usage</span>
+                        <span class="status-value" id="cpuUsage">-</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="cpuBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <h4>Database Status</h4>
+                    <div class="status-item">
+                        <span class="status-label">Database Size</span>
+                        <span class="status-value" id="dbSize">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Table Count</span>
+                        <span class="status-value" id="tableCount">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Total Records</span>
+                        <span class="status-value" id="totalRecords">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Last Backup</span>
+                        <span class="status-value" id="lastBackup">-</span>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <h4>Security Status</h4>
+                    <div class="status-item">
+                        <span class="status-label">
+                            <span class="risk-indicator" id="authRisk"></span>
+                            Authentication Security
+                        </span>
+                        <span class="status-value" id="authStatus">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">
+                            <span class="risk-indicator" id="dataRisk"></span>
+                            Data Encryption
+                        </span>
+                        <span class="status-value" id="dataStatus">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">
+                            <span class="risk-indicator" id="accessRisk"></span>
+                            Access Control
+                        </span>
+                        <span class="status-value" id="accessStatus">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">
+                            <span class="risk-indicator" id="auditRisk"></span>
+                            Audit Logging
+                        </span>
+                        <span class="status-value" id="auditStatus">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Audit -->
+        <div class="tab-content" id="audit">
+            <div class="audit-actions">
+                <button id="runSecurityScan" class="btn btn-primary">
+                    <i class="fas fa-shield-alt"></i> Run Security Scan
+                </button>
+                <button id="checkVulnerabilities" class="btn btn-warning">
+                    <i class="fas fa-bug"></i> Check Vulnerabilities
+                </button>
+                <button id="generateReport" class="btn btn-success">
+                    <i class="fas fa-file-pdf"></i> Generate Security Report
+                </button>
+            </div>
+
+            <div class="security-overview" id="auditResults">
+                <!-- Audit results loaded via JS -->
+            </div>
+
+            <div class="table-container">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Check Item</th>
+                            <th>Status</th>
+                            <th>Risk Level</th>
+                            <th>Description</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <!-- Audit details loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_security.js') }}"></script>
+{% endblock %}

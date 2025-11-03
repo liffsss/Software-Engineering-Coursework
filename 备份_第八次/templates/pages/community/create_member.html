@@ -1,0 +1,67 @@
+
+{% extends 'base/base.html' %}
+
+{% block title %}Add Member - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Add New Member</h1>
+        <a href="{{ url_for('community.manage_members') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Member Management
+        </a>
+    </div>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('community.create_member') }}">
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" class="form-control">
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                    <option value="moderator">Moderator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="join_date">Join Date</label>
+                <input type="date" id="join_date" name="join_date" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Add Member</button>
+                <a href="{{ url_for('community.manage_members') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

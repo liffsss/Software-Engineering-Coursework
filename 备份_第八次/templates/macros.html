@@ -1,0 +1,24 @@
+{% macro render_navigation(role) %}
+    {% if role == 'teacher' %}
+        {% include 'base/nav_teacher.html' %}
+    {% elif role == 'student' %}
+        {% include 'base/nav_student.html' %}
+    {% elif role == 'community_org' %}
+        {% include 'base/nav_community.html' %}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_user_info(username, role) %}
+    {% if username %}
+    <div class="user-info">
+        <i class="fas fa-user"></i>
+        <span>{{ username }}</span>
+        <span class="user-role">
+            {% if role == 'teacher' %}Teacher
+            {% elif role == 'student' %}Student
+            {% elif role == 'community_org' %}Community Organization
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+{% endmacro %}

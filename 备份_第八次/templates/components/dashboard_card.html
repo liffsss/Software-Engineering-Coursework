@@ -1,0 +1,11 @@
+<!-- templates/components/dashboard_card.html -->
+{% macro dashboard_card(icon, title, description, button_text, link="#") %}
+<div class="dashboard-card">
+    <div class="card-icon">
+        <i class="{{ icon }}"></i>
+    </div>
+    <h3>{{ title }}</h3>
+    <p>{{ description }}</p>
+    <a href="{{ link }}" class="btn btn-primary">{{ button_text }}</a>
+</div>
+{% endmacro %}

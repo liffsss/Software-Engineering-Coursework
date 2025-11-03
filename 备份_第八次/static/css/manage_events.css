@@ -1,0 +1,141 @@
+/* 活动管理页面样式 */
+.management-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: white;
+    /* 添加过渡动画 */
+    transition: all 0.3s ease;
+    /* 添加初始阴影 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 添加流光效果 */
+.management-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+    transition: left 0.6s ease;
+}
+
+.management-card:hover::before {
+    left: 100%;
+}
+
+/* 鼠标悬停时的放大效果 */
+.management-card:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: #d0d7de;
+}
+
+.event-content {
+    flex: 1;
+    transform: translateZ(0); /* 启用硬件加速 */
+}
+
+.event-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.event-details > div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 图标颜色变化动画 */
+.event-details i {
+    transition: color 0.3s ease;
+}
+
+.management-card:hover .event-details i {
+    color: #4a90e2;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* 状态徽章悬停动画 */
+.management-card:hover .status-badge {
+    transform: scale(1.05);
+}
+
+.status-upcoming {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-ongoing {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-completed {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.status-cancelled {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.event-actions {
+    display: flex;
+    gap: 0.5rem;
+    transform: translateZ(0); /* 启用硬件加速 */
+}
+
+/* 删除按钮动画 */
+.delete-form button {
+    transition: all 0.2s ease;
+}
+
+.delete-form button:hover {
+    transform: scale(1.05);
+    background-color: #dc3545;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .management-card {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .event-details {
+        grid-template-columns: 1fr;
+    }
+
+    .event-actions {
+        align-self: flex-end;
+    }
+}

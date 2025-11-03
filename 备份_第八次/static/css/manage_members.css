@@ -1,0 +1,399 @@
+/* 新的布局结构 */
+.members-management-layout {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* 左侧分组导航 */
+.groups-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+/* 分组列表 */
+.groups-list {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.group-item:hover {
+    background: white;
+    border-color: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.group-item.active {
+    background: white;
+    border-color: #007bff;
+    box-shadow: 0 2px 12px rgba(0,123,255,0.15);
+}
+
+.group-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.group-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.group-name {
+    font-weight: 600;
+    color: #333;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.group-desc {
+    color: #6c757d;
+    font-size: 0.8rem;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-count {
+    background: #e9ecef;
+    color: #6c757d;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.group-item.active .member-count {
+    background: #007bff;
+    color: white;
+}
+
+/* 颜色定义 */
+.color-all { background: #6c757d; }
+.color-ungrouped { background: #dc3545; }
+.color-0 { background: #007bff; }
+.color-1 { background: #28a745; }
+.color-2 { background: #ffc107; }
+.color-3 { background: #dc3545; }
+.color-4 { background: #6f42c1; }
+.color-5 { background: #fd7e14; }
+
+/* 右侧内容区域 */
+.members-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.current-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.current-group-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+/* 分组内容 */
+.group-section {
+    display: none;
+}
+
+.group-section.active {
+    display: block;
+}
+
+/* 子分组样式 */
+.group-subsection {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.subsection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+}
+
+.subsection-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.group-color-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.subsection-info h4 {
+    margin: 0;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.subsection-info .member-count {
+    background: #6c757d;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.subsection-content {
+    padding: 1.5rem;
+}
+
+/* 成员网格布局 */
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* 成员卡片优化 */
+.member-card.management-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+}
+
+.member-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.member-content {
+    flex: 1;
+    min-height: 120px;
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.member-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.member-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.role-badge, .status-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.role-admin { background: #dc3545; color: white; }
+.role-moderator { background: #fd7e14; color: white; }
+.role-member { background: #6c757d; color: white; }
+.status-active { background: #28a745; color: white; }
+.status-inactive { background: #6c757d; color: white; }
+.status-pending { background: #ffc107; color: #333; }
+
+.member-details {
+    margin-bottom: 1rem;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+.member-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.member-detail i {
+    width: 16px;
+    text-align: center;
+    color: #adb5bd;
+}
+
+.member-notes {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.member-notes p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+/* 成员操作按钮优化 */
+.member-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.member-actions .btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 6px;
+}
+
+/* 空状态样式 */
+.no-members-in-group {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.no-members-in-group .empty-state i {
+    color: #adb5bd;
+    margin-bottom: 1rem;
+}
+
+.no-members-in-group .empty-state h4 {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.no-members-in-group .empty-state p {
+    color: #adb5bd;
+    margin-bottom: 1.5rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .members-management-layout {
+        flex-direction: column;
+    }
+
+    .groups-sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .groups-list {
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .members-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .member-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .member-badges {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .current-group-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* 滚动条样式 */
+.groups-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.groups-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.groups-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.groups-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

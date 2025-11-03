@@ -1,0 +1,13 @@
+<div class="articles-container">
+    <h2 class="section-title">Latest Articles</h2>
+
+    <div class="articles-grid">
+        {% for article in articles %}
+            {% include 'components/article_card.html' %}
+        {% else %}
+        <div class="no-articles">
+            <p>No articles to display.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,77 @@
+<!-- templates/pages/student/courses.html -->
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+{% endblock %}
+
+{% block title %}My Courses - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>My Courses</h1>
+        <p>Manage your learning progress</p>
+    </div>
+
+    <!-- Course List -->
+    <div class="content-section">
+        <h2 class="section-title">Registered Courses</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if courses %}
+        <div class="courses-list">
+            {% for course in courses %}
+            <div class="course-card student-course-card">
+                <div class="course-header">
+                    <h3>{{ course['title'] }}</h3>
+                    <span class="status-badge
+                        {% if course['status'] == 'completed' %}status-completed
+                        {% else %}status-enrolled{% endif %}">
+                        {% if course['status'] == 'completed' %}Completed
+                        {% else %}In Progress{% endif %}
+                    </span>
+                </div>
+                <p class="course-description">{{ course['description'] }}</p>
+                <div class="course-details">
+                    <div class="detail-item">
+                        <span class="label">Teacher:</span>
+                        <span class="value">{{ course['teacher_name'] }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Enrollment Date:</span>
+                        <span class="value">{{ course['enrollment_date'][:10] }}</span>
+                    </div>
+                    {% if course['score'] %}
+                    <div class="detail-item">
+                        <span class="label">Current Score:</span>
+                        <span class="value score-value">{{ course['score'] }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="course-actions">
+                    <a href="{{ url_for('student.study_course', course_id=course['id']) }}" class="btn btn-primary">
+                        {% if course['status'] == 'completed' %}Review Course{% else %}Start Learning{% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-courses">
+            <p>You haven't registered for any courses yet</p>
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary">Browse Available Courses</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+<!--templates/pages/admin_dashboard/admin_dashboard.html-->
+{% extends 'base/base.html' %}
+
+{% block title %}Admin Dashboard - Komodo Hub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Add modern class names at appropriate positions -->
+<div class="dashboard-container fade-in">
+    <div class="dashboard-header">
+        <h1 class="gradient-text">Admin Dashboard</h1>
+        <p class="text-muted">Welcome back, Admin {{ session.username }}!</p>
+    </div>
+
+    <!-- Add glass morphism welcome card -->
+    <div class="welcome-card glass" style="margin-bottom: 2rem; padding: 2rem; border-radius: 12px;">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3 style="margin-bottom: 0.5rem;">Today's Overview</h3>
+                <p class="text-muted" style="margin-bottom: 0;">View latest platform dynamics and statistics</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="badge bg-primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    <i class="fas fa-chart-line me-2"></i>Live Update
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <h2 class="section-title">System Management</h2>
+        <div class="dashboard-grid">
+            {% from "components/dashboard_card.html" import dashboard_card %}
+
+            {{ dashboard_card(
+                icon="fas fa-users-cog",
+                title="User Management",
+                description="Manage all user accounts in the system",
+                button_text="Manage Users",
+                link=url_for('admin.manage_users')
+            ) }}
+
+            {{ dashboard_card(
+                icon="fas fa-cogs",
+                title="System Settings",
+                description="Configure system parameters and options",
+                button_text="System Settings",
+                link=url_for('admin.system_settings')
+            ) }}
+
+            {{ dashboard_card(
+                icon="fas fa-chart-bar",
+                title="Global Analytics",
+                description="View overall platform data statistics",
+                button_text="View Analytics",
+                link=url_for('admin.global_analytics')
+            ) }}
+
+            {{ dashboard_card(
+                icon="fas fa-shield-alt",
+                title="Security Center",
+                description="Manage system security and permissions",
+                button_text="Security Management",
+                link=url_for('admin.security_center')
+            ) }}
+        </div>
+    </div>
+
+    <!-- Articles List -->
+    <div class="articles-section">
+        <div class="section-header">
+            <h2 class="section-title">Latest Articles</h2>
+        </div>
+
+        <div class="articles-grid">
+            {% for article in articles %}
+                {% from "components/article_card.html" import article_card %}
+                {{ article_card(article, show_admin_actions=true) }}
+            {% else %}
+            <div class="no-articles">
+                <p>No articles to display.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- User Management Modal -->
+<div id="userManagementModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>User Management</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- User management content will be loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
+<!-- Article View Modal -->
+<div id="viewArticleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Article Details</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- Article content will be loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
+<!-- Article Edit Modal -->
+<div id="editArticleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Article</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- Edit form will be loaded via AJAX -->
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm Deletion</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this article? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="confirmDelete" class="btn btn-danger">Confirm Delete</button>
+                <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,366 @@
+学校用户：
+教师希望平台易于使用，能帮助开发和管理与动物保护相关的课程内容和活动。
+学生需有个性化账户，能参与课程、活动、上传作品，且个人信息需严格保密。
+学校管理员负责账户注册、订阅和学生注册等事务。这里被整合到平台管理来
+社区用户：
+如 #SaveOurAnimals 社区，希望平台提供文章、专栏、物种观察记录等功能，展示成员贡献。
+平台管理方：
+需要管理账户、注册学校和社区、生成业务仪表板，监控用户行为和服务表现。
+高度重视数据安全和隐私保护，尤其是儿童和教师的敏感信息。
+
+
+komodo-hub/
+├── app.py                 # 主应用入口
+├── config.py              # 应用配置
+├── database/              # 数据库相关
+│   ├── init_database.py   # 数据库初始化脚本
+│   ├── komodo_hub.db      # SQLite 数据库文件
+│   └── models.py          # 数据模型和数据库操作
+├── routes/                # 路由模块（蓝图）
+│   ├── admin.py           # 管理员路由
+│   ├── auth.py            # 认证路由（登录/退出）
+│   ├── community.py       # 社区组织路由
+│   ├── student.py         # 学生路由
+│   └── teacher.py         # 教师路由
+├── static/                # 静态资源
+│   ├── css/               # 样式文件
+│   │   ├── components/    # 组件样式
+│   │   │   └── navigation.css
+│   │   └── main.css       # 主样式文件
+│   ├── js/                # JavaScript 文件
+│   │   └── main.js        # 主脚本文件
+│   └── pages/             # 页面特定资源
+│       └── login/         # 登录页面资源
+│           ├── login.css
+│           └── login.js
+├── templates/             # Jinja2 模板
+│   ├── base/              # 基础模板组件
+│   │   ├── base.html      # 基础模板
+│   │   ├── footer.html    # 页脚组件
+│   │   ├── header.html    # 头部组件
+│   │   └── user_info.html # 用户信息组件
+│   ├── components/        # 可复用组件
+│   │   ├── article_card.html     # 文章卡片
+│   │   └── dashboard_card.html   # 仪表板卡片
+│   ├── pages/             # 页面模板
+│   │   ├── admin_dashboard/      # 管理员面板
+│   │   │   └── admin_dashboard.html
+│   │   ├── community/            # 社区组织面板
+│   │   │   └── community_dashboard.html
+│   │   ├── login/                # 登录页面
+│   │   │   └── login.html
+│   │   ├── student/              # 学生面板
+│   │   │   └── student_dashboard.html
+│   │   ├── teacher/              # 教师面板
+│   │   │   ├── analytics.html    # 数据分析
+│   │   │   ├── courses.html      # 课程管理
+│   │   │   ├── students.html     # 学生列表
+│   │   │   ├── students_management.html  # 学生管理
+│   │   │   └── teacher.html      # 教师主面板
+│   │   └── article_list.html     # 文章列表
+│   └── macros.html        # 宏定义
+├── utils/                 # 工具函数
+│   └── helpers.py         # 辅助函数
+├── run.py                 # 应用启动脚本
+└── requirements.txt       # Python 依赖
+
+
+
+1. 项目架构概览
+text
+komodo-hub/
+├── app.py                 # 应用入口点 - 注册蓝图和初始化
+├── config.py              # 应用配置 - 修改设置和常量
+├── database/              # 数据层 - 所有数据库相关代码
+├── routes/                # 路由层 - 处理HTTP请求和响应
+├── static/                # 静态资源 - CSS、JS、图片等
+├── templates/             # 视图层 - HTML模板和组件
+├── utils/                 # 工具函数 - 可复用的辅助代码
+└── run.py                 # 启动脚本 - 可选的生产环境启动
+2. 代码存放位置指南
+数据库相关代码 → /database/
+models.py: 数据库模型和通用查询函数
+
+init_database.py: 数据库初始化脚本
+
+新增表或复杂查询: 在 models.py 中添加新函数
+
+示例：添加新表查询函数
+
+# 在 database/models.py 中添加
+
+def get_course_details(course_id):
+    """获取课程详细信息"""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT c.*, u.username as teacher_name
+            FROM courses c
+            JOIN users u ON c.teacher_id = u.id
+            WHERE c.id = ?
+        """, (course_id,))
+        return cursor.fetchone()
+    finally:
+        conn.close()
+路由处理代码 → /routes/
+每个角色一个文件：teacher.py, student.py, admin.py等
+
+通用功能放在 auth.py (认证相关)
+
+示例：添加新路由
+
+python
+# 在 routes/teacher.py 中添加
+
+@teacher_bp.route('/course/<int:course_id>/details')
+def course_details(course_id):
+    if 'role' in session and session['role'] == 'teacher':
+        course = get_course_details(course_id)  # 来自 models.py
+        return render_template(
+            'pages/teacher/course_details.html',
+            course=course,
+            username=session['username']
+        )
+    return redirect(url_for('auth.login'))
+前端模板 → /templates/
+页面模板: /templates/pages/{角色}/{页面名}.html
+
+可复用组件: /templates/components/{组件名}.html
+
+基础模板: /templates/base/ 目录下
+
+示例：创建新页面模板
+
+html
+<!-- 在 templates/pages/teacher/course_details.html 中 -->
+
+{% extends 'base/base.html' %}
+
+{% block title %}课程详情 - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>{{ course.title }}</h1>
+        <p>教师: {{ course.teacher_name }}</p>
+    </div>
+
+    <div class="content-section">
+        <h2 class="section-title">课程描述</h2>
+        <p>{{ course.description }}</p>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('teacher.courses') }}" class="btn btn-secondary">返回课程列表</a>
+            <a href="#" class="btn btn-primary">编辑课程</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+静态资源 → /static/
+CSS文件: /static/css/ 按组件或页面组织
+
+JavaScript: /static/js/ 按功能组织
+
+页面特定资源: /static/pages/{页面名}/
+
+示例：添加新组件的CSS
+
+css
+/* 在 static/css/components/course-details.css 中 */
+
+.course-details {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.course-details h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.course-details .action-buttons {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+}
+
+/* 然后在 static/css/main.css 中导入 */
+@import url('components/course-details.css');
+工具函数 → /utils/
+可复用的辅助函数
+
+与业务逻辑无关的通用功能
+
+示例：添加日期格式化工具
+
+python
+# 在 utils/helpers.py 中添加
+
+from datetime import datetime
+
+def format_date(date_string, format='%Y-%m-%d %H:%M'):
+    """格式化日期字符串"""
+    if isinstance(date_string, str):
+        try:
+            date_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+            return date_obj.strftime(format)
+        except ValueError:
+            return date_string
+    return date_string
+3. 添加新功能的完整流程
+步骤 1: 确定功能所属模块
+教师功能 → routes/teacher.py
+
+学生功能 → routes/student.py
+
+通用功能 → routes/auth.py 或新建模块
+
+步骤 2: 设计数据模型 (如果需要)
+在 database/models.py 中添加查询函数
+
+如果需要新表，在 database/init_database.py 中添加表结构
+
+步骤 3: 创建路由处理
+在相应的路由文件中添加新路由函数
+
+遵循现有的认证和授权模式
+
+步骤 4: 创建前端模板
+在 templates/pages/{角色}/ 下创建新模板
+
+使用现有的组件和样式
+
+步骤 5: 添加样式和脚本 (如果需要)
+在 static/css/ 和 static/js/ 中添加相应文件
+
+确保在基础模板中正确引入
+
+步骤 6: 测试功能
+测试各种用户角色的访问权限
+
+测试表单验证和错误处理
+
+4. 遵循的编码规范
+Python 代码
+使用 PEP 8 风格指南
+
+函数和变量使用小写字母和下划线
+
+类名使用驼峰命名法
+
+添加适当的文档字符串
+
+HTML 模板
+使用一致的缩进（2个空格）
+
+使用双引号用于属性
+
+使用语义化的HTML标签
+
+CSS 样式
+使用BEM命名约定（可选但推荐）
+
+使用CSS变量保持一致的主题
+
+按组件组织样式文件
+
+数据库操作
+始终使用参数化查询防止SQL注入
+
+使用try-finally确保数据库连接关闭
+
+在适当的地方使用事务
+
+5. 教师模块示例解析
+以教师模块的学生管理功能为例，说明完整实现：
+
+数据层 (database/models.py)
+python
+def get_teacher_students(teacher_id):
+    """获取教师的所有学生"""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT s.id, s.full_name, s.email, s.created_at
+            FROM students s
+            JOIN course_students cs ON s.id = cs.student_id
+            JOIN courses c ON cs.course_id = c.id
+            WHERE c.teacher_id = ?
+            GROUP BY s.id
+            ORDER BY s.created_at DESC
+        """, (teacher_id,))
+        return cursor.fetchall()
+    finally:
+        conn.close()
+路由层 (routes/teacher.py)
+python
+@teacher_bp.route('/students_management', methods=['GET', 'POST'])
+def students_management():
+    if 'role' in session and session['role'] == 'teacher':
+        # 处理表单提交
+        if request.method == 'POST':
+            # 添加或删除学生的逻辑
+            pass
+
+        # 获取数据
+        students = get_teacher_students(session['user_id'])
+
+        # 渲染模板
+        return render_template(
+            'pages/teacher/students_management.html',
+            username=session['username'],
+            students=students
+        )
+    return redirect(url_for('auth.login'))
+视图层 (templates/pages/teacher/students_management.html)
+html
+{% extends 'base/base.html' %}
+
+{% block title %}学生管理 - Komodo Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>学生管理</h1>
+        <p>管理您的学生账户</p>
+    </div>
+
+    <!-- 表单和内容 -->
+</div>
+{% endblock %}
+6. 常见任务快速参考
+添加新页面
+在相应角色的路由文件中添加新路由
+
+在 templates/pages/{角色}/ 下创建HTML模板
+
+如果需要，添加特定的CSS和JS文件
+
+添加数据库查询
+在 database/models.py 中添加查询函数
+
+在路由中调用该函数
+
+将结果传递给模板
+
+添加表单处理
+在路由中检查 request.method == 'POST'
+
+验证表单数据
+
+执行数据库操作
+
+使用 flash() 提供用户反馈
+
+重定向到适当页面
+
+添加API端点
+在适当的路由文件中添加新路由
+
+使用 jsonify 返回JSON响应
+
+处理可能的错误情况

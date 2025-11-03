@@ -1,0 +1,201 @@
+
+{% extends 'base/base.html' %}
+
+{% block title %}Organization Profile - Komodo Hub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Organization Profile</h1>
+        <a href="{{ url_for('community.dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="profile-container">
+        <!-- Basic Information Display -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <h2><i class="fas fa-building"></i> Basic Information</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="editProfileBtn">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+            </div>
+            <div class="profile-content">
+                <div class="profile-field">
+                    <label><i class="fas fa-user"></i> Username:</label>
+                    <span>{{ user.username }}</span>
+                </div>
+                <div class="profile-field">
+                    <label><i class="fas fa-id-card"></i> Organization Name:</label>
+                    <span>{{ user.org_name or 'Not set' }}</span>
+                </div>
+                <div class="profile-field">
+                    <label><i class="fas fa-user-tie"></i> Contact Person:</label>
+                    <span>{{ user.contact_person or 'Not set' }}</span>
+                </div>
+                <div class="profile-field">
+                    <label><i class="fas fa-envelope"></i> Email:</label>
+                    <span>{{ user.email or 'Not set' }}</span>
+                </div>
+                <div class="profile-field">
+                    <label><i class="fas fa-phone"></i> Phone:</label>
+                    <span>{{ user.phone or 'Not set' }}</span>
+                </div>
+                <div class="profile-field">
+                    <label><i class="fas fa-map-marker-alt"></i> Address:</label>
+                    <span>{{ user.address or 'Not set' }}</span>
+                </div>
+                <div class="profile-field">
+                    <label><i class="fas fa-calendar"></i> Registration Date:</label>
+                    <span>{{ user.created_at[:10] }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Form (Hidden by default) -->
+        <div class="profile-card edit-form" id="editProfileForm" style="display: none;">
+            <div class="profile-header">
+                <h2><i class="fas fa-edit"></i> Edit Organization Profile</h2>
+            </div>
+            <form method="POST" class="profile-content">
+                <div class="form-group">
+                    <label for="org_name">Organization Name *</label>
+                    <input type="text" id="org_name" name="org_name" 
+                           value="{{ user.org_name or '' }}" 
+                           placeholder="Enter organization name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contact_person">Contact Person Name *</label>
+                    <input type="text" id="contact_person" name="contact_person" 
+                           value="{{ user.contact_person or '' }}" 
+                           placeholder="Enter contact person name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" 
+                           value="{{ user.email or '' }}" 
+                           placeholder="Enter email address" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" 
+                           value="{{ user.phone or '' }}" 
+                           placeholder="Enter phone number" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Organization Address</label>
+                    <textarea id="address" name="address" 
+                              placeholder="Enter detailed address" 
+                              rows="3" class="form-control">{{ user.address or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Organization Description</label>
+                    <textarea id="description" name="description" 
+                              placeholder="Briefly introduce your organization..." 
+                              rows="4" class="form-control">{{ user.description or '' }}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ article_count or 0 }}</h3>
+                    <p>Published Articles</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ event_count or 0 }}</h3>
+                    <p>Organized Events</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ member_count or 0 }}</h3>
+                    <p>Community Members</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Organization Description Card -->
+        {% if user.description %}
+        <div class="profile-card">
+            <div class="profile-header">
+                <h2><i class="fas fa-info-circle"></i> Organization Description</h2>
+            </div>
+            <div class="profile-content">
+                <p class="org-description">{{ user.description }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editProfileForm = document.getElementById('editProfileForm');
+    const profileCards = document.querySelectorAll('.profile-card:not(.edit-form)');
+
+    // Show edit form
+    editProfileBtn.addEventListener('click', function() {
+        profileCards.forEach(card => {
+            card.style.display = 'none';
+        });
+        editProfileForm.style.display = 'block';
+    });
+
+    // Cancel editing
+    cancelEditBtn.addEventListener('click', function() {
+        editProfileForm.style.display = 'none';
+        profileCards.forEach(card => {
+            card.style.display = 'block';
+        });
+    });
+
+    // Add hover effects to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}
