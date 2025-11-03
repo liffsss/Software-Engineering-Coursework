@@ -31,7 +31,7 @@ Komodo Hub serves three main user groups with specialized features:
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/your-username/komodo-hub.git
+git clone https://github.com/liffsss/Software-Engineering-Coursework.git
 cd komodo-hub
 ```
 
